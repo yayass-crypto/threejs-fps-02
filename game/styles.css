@@ -1,0 +1,128 @@
+/* Kestrel Yard HUD — dark tactical overlay, amber accents. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0e1418; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; color: #e8e4da; }
+#c { display: block; width: 100vw; height: 100vh; cursor: crosshair; }
+#hud { position: fixed; inset: 0; pointer-events: none; user-select: none; }
+
+/* Full-screen overlays */
+.dmg { position: absolute; inset: 0; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(200, 40, 20, .55) 100%); }
+.white { position: absolute; inset: 0; opacity: 0; transition: opacity 2.2s; background: #fff; }
+
+/* Crosshair */
+.xh { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.xh-l { position: absolute; left: 50%; top: 50%; background: #e8f2e8; box-shadow: 0 0 2px #000; }
+.xh-l.n, .xh-l.s { width: 2px; height: 10px; }
+.xh-l.w, .xh-l.e { width: 10px; height: 2px; }
+.xh-dot { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px;
+  background: #e8f2e8; border-radius: 50%; transform: translate(-50%, -50%); }
+.hit { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+  transform: translate(-50%, -50%) rotate(45deg); opacity: 0; }
+.hit::before, .hit::after { content: ''; position: absolute; background: #fff; }
+.hit::before { left: 12px; top: 0; width: 2px; height: 26px; }
+.hit::after { left: 0; top: 12px; width: 26px; height: 2px; }
+.hit.show { animation: hitpop .25s ease-out; }
+.hit.kill::before, .hit.kill::after { background: #ff5a3c; }
+@keyframes hitpop { 0% { opacity: 1; transform: translate(-50%, -50%) rotate(45deg) scale(1.4); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(45deg) scale(0.9); } }
+
+/* Top bar */
+.top { position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 18px; align-items: center; font-weight: 700; letter-spacing: 1px; }
+.score { font-size: 15px; padding: 6px 12px; background: rgba(10, 16, 20, .72); border-radius: 4px; }
+.score.v { color: #6fc3e8; border-bottom: 2px solid #3fa7c9; }
+.score.j { color: #f0a35e; border-bottom: 2px solid #e08a2e; }
+.timer { font-size: 22px; padding: 4px 14px; background: rgba(10, 16, 20, .8);
+  border: 1px solid #4a5a63; border-radius: 4px; min-width: 96px; text-align: center; }
+.timer.buyphase { color: #e0a53a; border-color: #e0a53a; }
+.timer.bomb { color: #ff6a4a; border-color: #ff6a4a; }
+.round { position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; letter-spacing: 2px; color: #9fb2bd; }
+.pips { position: absolute; top: 78px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 40px; font-size: 13px; letter-spacing: 3px; }
+.pips-v { color: #6fc3e8; } .pips-j { color: #f0a35e; }
+
+/* Killfeed */
+.feed { position: absolute; top: 14px; right: 16px; display: flex; flex-direction: column;
+  gap: 4px; align-items: flex-end; font-size: 13px; }
+.feed-line { background: rgba(10, 16, 20, .72); padding: 4px 10px; border-radius: 3px;
+  transition: opacity .8s; }
+.feed-line.fade { opacity: 0; }
+.fk { color: #6fc3e8; font-weight: 700; } .fv { color: #f0a35e; font-weight: 700; }
+.fw { color: #c9c2b4; margin: 0 6px; }
+
+/* Minimap */
+.mapwrap { position: absolute; right: 16px; bottom: 16px; text-align: right; }
+.map { border: 1px solid #4a5a63; border-radius: 4px; background: #10181d; }
+.maplabel { font-size: 10px; letter-spacing: 1px; color: #9fb2bd; margin-top: 4px; }
+
+/* Status: health / armour / money */
+.status { position: absolute; left: 16px; bottom: 16px; }
+.hpnum { font-size: 44px; font-weight: 800; line-height: 1; }
+.hpnum::after { content: ' HP'; font-size: 13px; color: #9fb2bd; font-weight: 400; }
+.hpbar { width: 190px; height: 8px; background: rgba(255, 255, 255, .14);
+  border-radius: 4px; margin: 6px 0 4px; overflow: hidden; }
+.hpfill { height: 100%; width: 100%; background: #7fd069; transition: width .2s; }
+.arnum { font-size: 12px; letter-spacing: 1px; color: #9fc3d8; }
+.money { font-size: 19px; font-weight: 700; color: #e0c35a; margin-top: 6px; }
+
+/* Ammo */
+.ammo { position: absolute; right: 16px; bottom: 168px; text-align: right; }
+.ammomag { font-size: 40px; font-weight: 800; line-height: 1; display: inline; }
+.ammores { font-size: 16px; color: #9fb2bd; display: inline; }
+.wname { font-size: 13px; letter-spacing: 1px; color: #d8d2c4; margin-top: 2px; }
+.gren { font-size: 11px; letter-spacing: 1px; color: #9fb2bd; margin-top: 4px; }
+
+/* Plant progress */
+.plantwrap { position: absolute; left: 50%; top: 62%; transform: translateX(-50%);
+  width: 240px; text-align: center; display: none; }
+.plantwrap.show { display: block; }
+.plantlabel { font-size: 12px; letter-spacing: 2px; color: #e0a53a; margin-bottom: 6px; }
+.plantbar { height: 8px; background: rgba(255, 255, 255, .16); border-radius: 4px; overflow: hidden; }
+.plantfill { height: 100%; width: 0; background: #e0a53a; }
+
+/* Toast + banner */
+.toast { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%);
+  background: rgba(10, 16, 20, .85); border: 1px solid #4a5a63; padding: 8px 16px;
+  border-radius: 4px; font-size: 14px; opacity: 0; transition: opacity .3s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+.banner { position: absolute; left: 50%; top: 34%; transform: translate(-50%, -50%);
+  text-align: center; opacity: 0; transition: opacity .4s; }
+.banner.show { opacity: 1; }
+.banner-title { font-size: 52px; font-weight: 800; letter-spacing: 4px; }
+.banner.good .banner-title { color: #7fd069; text-shadow: 0 0 24px rgba(127, 208, 105, .5); }
+.banner.bad .banner-title { color: #e05a3a; text-shadow: 0 0 24px rgba(224, 90, 58, .5); }
+.banner-sub { font-size: 16px; color: #d8d2c4; margin-top: 8px; }
+
+/* Buy menu */
+.buy { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 420px; background: rgba(10, 16, 20, .92); border: 1px solid #e0a53a;
+  border-radius: 6px; padding: 18px 20px; display: none; }
+.buy.show { display: block; }
+.buy-title { font-size: 14px; letter-spacing: 2px; color: #e0a53a; margin-bottom: 12px; }
+.buy-row { display: flex; gap: 10px; padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,.08);
+  font-size: 14px; }
+.buy-key { color: #e0a53a; font-weight: 700; width: 30px; }
+.buy-name { flex: 1; }
+.buy-price { color: #e0c35a; font-weight: 700; }
+.buy-money { margin-top: 12px; font-size: 14px; color: #e0c35a; }
+
+/* Start screen */
+.start { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  flex-direction: column; background: rgba(8, 12, 15, .78); text-align: center; pointer-events: auto; }
+.start.show { display: flex; }
+.start-title { font-size: 64px; font-weight: 800; letter-spacing: 8px; color: #e8e4da;
+  text-shadow: 0 0 32px rgba(63, 167, 201, .6); }
+.start-sub { font-size: 16px; letter-spacing: 3px; color: #6fc3e8; margin: 6px 0 22px; }
+.start-body { max-width: 640px; font-size: 15px; line-height: 1.6; color: #cfc9bb; }
+.start-body p { margin-bottom: 12px; }
+.start-body b { color: #e8e4da; }
+.start-btn { margin-top: 14px; padding: 14px 44px; font-size: 19px; font-weight: 800;
+  letter-spacing: 3px; color: #0c1114; background: #e0a53a; border: none; border-radius: 5px;
+  cursor: pointer; }
+.start-btn:hover { background: #f0bc4a; }
+.start-note { margin-top: 14px; font-size: 12px; color: #9fb2bd; }
+
+.help { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+  font-size: 11px; letter-spacing: 1px; color: rgba(200, 210, 216, .55); white-space: nowrap; }
